@@ -1,0 +1,61 @@
+-- Met onderstaande code maak je in SQL de database (-- is voor een comment);
+ 
+-- Database aanmaken 
+CREATE DATABASE IF NOT EXISTS Bevolkingsregister;
+USE Bevolkingsregister;
+ 
+-- Eerst de tabel Adres aanmaken omdat deze voorkomt in de tabel Inwoner;
+-- DOE DIT WEL IN DE JUISTE DATABASE ZODAT ZE GEKOPPELD ZIJN...;
+CREATE TABLE Adres (
+    Kadaster_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Adres VARCHAR(50) NOT NULL,
+    Woonplaats VARCHAR(30) NOT NULL
+);
+CREATE TABLE Inwoner (
+    Inwoner_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Naam VARCHAR(30) NOT NULL,
+    Achternaam VARCHAR(30) NOT NULL,
+    Geslacht ENUM('man','vrouw','partner') NOT NULL,
+    Adres_ID INT,
+    Geboortedatum DATE NOT NULL,
+    Sterfdatum DATE,
+    FOREIGN KEY (Adres_ID) REFERENCES Adres(Kadaster_ID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
+CREATE TABLE UserAccount (
+    User_ID INT AUTO_INCREMENT PRIMARY KEY,
+    User_name VARCHAR(50) NOT NULL UNIQUE,
+    PasswordHash VARCHAR(255) NOT NULL,
+    Beroep ENUM('werkeloos','ambtenaar','arbeider') NOT NULL,
+    Inwoner_ID INT,
+    FOREIGN KEY (Inwoner_ID) REFERENCES Inwoner(Inwoner_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+CREATE TABLE Relatie (
+    Relatie_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Inwoner_ID_1 INT NOT NULL,
+    Inwoner_ID_2 INT NOT NULL,
+    Relatie_type ENUM('ouder','kind','partner') NOT NULL,
+    FOREIGN KEY (Inwoner_ID_1) REFERENCES Inwoner(Inwoner_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (Inwoner_ID_2) REFERENCES Inwoner(Inwoner_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+ 
+CREATE TABLE HuwelijksCheck (
+    Check_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Inwoner_ID_1 INT NOT NULL,
+    Inwoner_ID_2 INT NOT NULL,
+    Inteelt_Percentage DECIMAL(5,2),
+    Goedkeuring BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (Inwoner_ID_1) REFERENCES Inwoner(Inwoner_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (Inwoner_ID_2) REFERENCES Inwoner(Inwoner_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
